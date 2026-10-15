@@ -1,0 +1,11 @@
+# Compiled output
+target/
+*.class
+
+# Eclipse configuration
+.settings/
+.project
+.classpath
+
+# Log & test files
+*.log
