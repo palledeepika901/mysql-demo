@@ -58,8 +58,8 @@ public class Order {
         BigDecimal totalAmount = lines.stream()
                 .map(line -> line.lineTotal().amount())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return new Money(totalAmount);
+    
     }
 
     public OrderId getId() {
