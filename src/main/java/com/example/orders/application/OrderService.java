@@ -1,37 +1,42 @@
 package com.example.orders.application;
+import com.example.orders.domain.Order;
+import com.example.orders.domain.OrderStatus; // Required for the OrderStatus enum
+import org.springframework.stereotype.Service;
 
-import com.example.orders.domain.*;
-import java.util.*;
-import java.util.stream.Collectors;
 
+@Service
 public class OrderService {
-    private final List<BaseOrder> orders = new ArrayList<>();
 
-    public void addOrder(BaseOrder order) throws OrderValidationException {
-        if (order == null || order.getItems() == null || order.getItems().isEmpty()) {
-            throw new OrderValidationException("Order must contain at least one item.");
-        }
-        orders.add(order);
+    // Inject the interface, NOT the implementation
+    private final OrderRepositoryPort orderRepository;
+
+    public OrderService(OrderRepositoryPort orderRepository) {
+        this.orderRepository = orderRepository;
     }
 
-    public BaseOrder findById(String orderId) {
-        return orders.stream()
-                .filter(o -> o.getOrderId().equalsIgnoreCase(orderId))
-                .findFirst()
-                .orElseThrow(() -> new OrderNotFoundException("Order with ID " + orderId + " not found."));
+    public void createNewOrder(String status, String productName, int quantity, double price) {
+        // Core business logic (domain)
+        Order newOrder = new Order();
+
+        // Converts the String status into the OrderStatus enum
+        newOrder.setStatus(OrderStatus.valueOf(status));
+        
+        // Map the new fields to the entity
+        newOrder.setProductName(productName);
+        newOrder.setQuantity(quantity);
+        newOrder.setPrice(price);
+
+        /* 
+         * NOTE: If you updated your Order constructor to accept all fields at once 
+         * as suggested in the tutorial, you can replace the 5 lines above with:
+         * Order newOrder = new Order(OrderStatus.valueOf(status), productName, quantity, price);
+         */
+
+        // Save using the port
+        orderRepository.save(newOrder);
     }
 
-    // Filter using Java Streams & Lambdas
-    public List<BaseOrder> filterByStatus(OrderStatus status) {
-        return orders.stream()
-                .filter(order -> order.getStatus() == status)
-                .collect(Collectors.toList());
-    }
-
-    // Sort by total order value descending
-    public List<BaseOrder> getOrdersSortedByTotal() {
-        return orders.stream()
-                .sorted(Comparator.comparingDouble(BaseOrder::calculateFinalTotal).reversed())
-                .collect(Collectors.toList());
-    }
+    // Note: If you want to keep your previous addOrder, filterByStatus,
+    // or getOrdersSortedByTotal methods, you will need to rewrite them
+    // to call methods on 'orderRepository' instead of the deleted 'orders' ArrayList
 }

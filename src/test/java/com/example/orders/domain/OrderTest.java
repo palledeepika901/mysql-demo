@@ -1,12 +1,18 @@
 
     package com.example.orders.domain;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+// Included because your other tests use it
+import org.junit.jupiter.api.DisplayName;
+
 
 class OrderTest {
+	// Restore the original constructor for the test suite
+    
 
     @Test
     @DisplayName("Rule 1: An order must contain at least one line before confirmation")
@@ -16,6 +22,7 @@ class OrderTest {
         IllegalStateException ex = assertThrows(IllegalStateException.class, order::confirm);
         assertTrue(ex.getMessage().contains("at least one line before confirmation"));
     }
+    
 
     @Test
     @DisplayName("Rule 1: Confirmation succeeds when order has lines")
